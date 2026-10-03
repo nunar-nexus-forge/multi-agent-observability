@@ -75,12 +75,28 @@ class EpisodeStore:
             return []
         return sorted(p.stem for p in self.root.glob("ep-*.json"))
 
+    def _recency_key(self, episode_id: str) -> tuple[float, int, str]:
+        """Sort key for ``latest``: the episode's recorded start time first, then the file
+        modification time and the id as tie-breakers (file times coincide on file systems with
+        coarse timestamps, so they are not reliable on their own)."""
+        path = self._path(episode_id)
+        try:
+            with path.open(encoding="utf-8") as fh:
+                started = float(json.load(fh).get("started_at", 0.0))
+        except (OSError, ValueError, TypeError):
+            started = 0.0
+        try:
+            mtime = path.stat().st_mtime_ns
+        except OSError:
+            mtime = 0
+        return (started, mtime, episode_id)
+
     def resolve(self, ref: str) -> str:
         ids = self.ids()
         if ref == "latest":
             if not ids:
                 raise KeyError("no episodes recorded yet")
-            return max(ids, key=lambda i: self._path(i).stat().st_mtime)
+            return max(ids, key=self._recency_key)
         if ref in ids:
             return ref
         matches = [i for i in ids if i.startswith(ref)]
@@ -133,7 +149,8 @@ class InMemoryEpisodeStore:
         if ref == "latest":
             if not self._episodes:
                 raise KeyError("no episodes recorded yet")
-            return max(self._episodes.values(), key=lambda e: e.started_at).id
+            # most recently started; among equal start times the one saved last
+            return max(enumerate(self._episodes.values()), key=lambda ie: (ie[1].started_at, ie[0]))[1].id
         if ref in self._episodes:
             return ref
         matches = [i for i in self._episodes if i.startswith(ref)]

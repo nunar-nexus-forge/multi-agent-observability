@@ -7,6 +7,10 @@ All notable changes to `multi-agent-observability` are documented here. The form
 ## [Unreleased]
 
 ### Fixed
+- `EpisodeStore.resolve("latest")` chose an episode by file modification time only, which returned the
+  wrong episode on file systems with coarse timestamps (seen on Windows); it now uses the recorded start
+  time, with the file time and the id as tie-breakers. A test no longer assumes `/` path separators.
+- CI caches uv by `pyproject.toml` (the lock file is not committed), which newer `setup-uv` releases require.
 - `ma-trace show --events` now prints meaningful `False` flags (`hit=false` for memory misses,
   `verified=false`, `output_recorded=false`) and zero-valued fields such as `index=0`; only the
   `noop` and `replayed` flags are hidden when false.

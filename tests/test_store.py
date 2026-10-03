@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import os
+from pathlib import Path
+
 import pytest
 
 import ma_trace as mt
@@ -38,7 +41,21 @@ def test_env_and_default_dir(tmp_path, monkeypatch):
     monkeypatch.setenv("MA_TRACE_STORE", str(tmp_path / "custom"))
     assert EpisodeStore().root == tmp_path / "custom"
     monkeypatch.delenv("MA_TRACE_STORE")
-    assert str(EpisodeStore().root).endswith(".ma-trace/episodes")
+    assert EpisodeStore().root == Path(".ma-trace/episodes")
+
+
+def test_latest_prefers_start_time_over_file_time(tmp_path):
+    store = EpisodeStore(tmp_path)
+    store.save(_episode("bbb", 20))
+    store.save(_episode("aaa", 10))
+    same = 1_700_000_000
+    for episode_id in store.ids():  # identical file times, as on coarse-timestamp file systems
+        os.utime(store._path(episode_id), (same, same))
+    assert store.resolve("latest") == "ep-2026-bbb"
+    memory = InMemoryEpisodeStore()
+    memory.save(_episode("ccc", 30))
+    memory.save(_episode("ddd", 30))  # equal start times: the one saved last wins
+    assert memory.resolve("latest") == "ep-2026-ddd"
 
 
 def test_summary_fields(tmp_path):
