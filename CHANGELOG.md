@@ -6,25 +6,10 @@ All notable changes to `multi-agent-observability` are documented here. The form
 
 ## [Unreleased]
 
-### Fixed
-- `EpisodeStore.resolve("latest")` chose an episode by file modification time only, which returned the
-  wrong episode on file systems with coarse timestamps (seen on Windows); it now uses the recorded start
-  time, with the file time and the id as tie-breakers. A test no longer assumes `/` path separators.
-- CI caches uv by `pyproject.toml` (the lock file is not committed), which newer `setup-uv` releases require.
-- `ma-trace show --events` now prints meaningful `False` flags (`hit=false` for memory misses,
-  `verified=false`, `output_recorded=false`) and zero-valued fields such as `index=0`; only the
-  `noop` and `replayed` flags are hidden when false.
-- The bundled demo and the README explain that `ma-trace replay` must run from the directory
-  that contains the entrypoint module (`examples/`), and the demo's `sys.path` handling is portable.
+## [0.1.0] - 2026-10-03
 
-### Changed
-- README, `NOTICE`, `CITATION.cff` and the package metadata now describe the software only;
-  the SLO thresholds and the sampler default are documented as library defaults to calibrate.
-
-### Removed
-- Unused `ReplaySession.note_contract_result` (contract pass counts come from the replayed episode).
-
-## [0.1.0] - 2026-09-27
+First release on PyPI: the initial version of 27 September 2026 (*Added*) together with
+the changes made to it before publishing.
 
 ### Added
 - Episodes with seeded randomness, an ordered event log and JSON persistence (`EpisodeStore`).
@@ -37,3 +22,21 @@ All notable changes to `multi-agent-observability` are documented here. The form
 - Deterministic replay engine (`mt.replay`, `ma-trace replay`) with divergence reporting.
 - CLI: `list`, `show`, `graph`, `metrics`, `memory`, `replay`, `diff`, `export`, `import`, `delete`.
 - Adapters: LangChain/LangGraph callback handler and helpers, CrewAI event-bus listener, AutoGen AgentChat message tracer and AG2 hooks.
+
+### Changed
+- README, `NOTICE`, `CITATION.cff` and the package metadata now describe the software only;
+  the SLO thresholds and the sampler default are documented as library defaults to calibrate.
+
+### Removed
+- Unused `ReplaySession.note_contract_result` (contract pass counts come from the replayed episode).
+
+### Fixed
+- `EpisodeStore.resolve("latest")` chose an episode by file modification time only, which returned the
+  wrong episode on file systems with coarse timestamps (seen on Windows); it now uses the recorded start
+  time, with the file time and the id as tie-breakers. A test no longer assumes `/` path separators.
+- CI caches uv by `pyproject.toml` (the lock file is not committed), which newer `setup-uv` releases require.
+- `ma-trace show --events` now prints meaningful `False` flags (`hit=false` for memory misses,
+  `verified=false`, `output_recorded=false`) and zero-valued fields such as `index=0`; only the
+  `noop` and `replayed` flags are hidden when false.
+- The bundled demo and the README explain that `ma-trace replay` must run from the directory
+  that contains the entrypoint module (`examples/`), and the demo's `sys.path` handling is portable.

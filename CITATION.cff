@@ -3,7 +3,7 @@ message: "If you use multi-agent-observability, please cite it as below."
 type: software
 title: "multi-agent-observability (MA-Trace): causal tracing, coordination SLOs and deterministic replay for multi-agent LLM systems"
 version: 0.1.0
-date-released: "2026-09-27"
+date-released: "2026-10-03"
 license: Apache-2.0
 repository-code: "https://github.com/nunar-nexus-forge/multi-agent-observability"
 authors:
