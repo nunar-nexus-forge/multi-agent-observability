@@ -23,7 +23,7 @@ from . import semconv as sc
 from ._version import __version__
 from .context import _current_agent, _current_episode, current_agent, current_episode, current_replay
 from .contracts import Contract
-from .episode import Episode
+from .episode import Episode, _wall_time
 from .events import (
     ActionEvent,
     AgentEvent,
@@ -201,7 +201,7 @@ class MATrace:
             ep.attributes["error"] = f"{type(exc).__name__}: {exc}"
             raise
         finally:
-            ep.ended_at = time.time()
+            ep.ended_at = _wall_time()
             try:
                 self._finish_episode(ep, span)
             finally:
@@ -253,7 +253,7 @@ class MATrace:
         with self._lock:
             counter = self._seq.setdefault(ep.id, itertools.count())
             event.seq = next(counter)
-            event.t = time.time()
+            event.t = _wall_time()
             ep.events.append(event)
         return event
 

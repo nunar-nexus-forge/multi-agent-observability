@@ -34,6 +34,10 @@ the changes made to it before publishing.
 - `EpisodeStore.resolve("latest")` chose an episode by file modification time only, which returned the
   wrong episode on file systems with coarse timestamps (seen on Windows); it now uses the recorded start
   time, with the file time and the id as tie-breakers. A test no longer assumes `/` path separators.
+- Episodes started back to back could share a start time where the wall clock advances in coarse
+  steps (about 16 ms on Windows before Python 3.13), so `latest` and `ma-trace list` ordered them by
+  the random part of the id. Start, event and end times recorded by the tracer now strictly increase
+  within a process.
 - CI caches uv by `pyproject.toml` (the lock file is not committed), which newer `setup-uv` releases require.
 - `ma-trace show --events` now prints meaningful `False` flags (`hit=false` for memory misses,
   `verified=false`, `output_recorded=false`) and zero-valued fields such as `index=0`; only the

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import time
 from pathlib import Path
 
 import pytest
@@ -56,6 +57,19 @@ def test_latest_prefers_start_time_over_file_time(tmp_path):
     memory.save(_episode("ccc", 30))
     memory.save(_episode("ddd", 30))  # equal start times: the one saved last wins
     assert memory.resolve("latest") == "ep-2026-ddd"
+
+
+def test_back_to_back_episodes_keep_their_order_within_one_clock_tick(tmp_path, monkeypatch):
+    monkeypatch.setattr(time, "time", lambda: 1_800_000_000.0)  # a clock that does not advance
+    t = mt.MATrace(store=str(tmp_path), otel_metrics=False)
+    with t.episode("first") as first:
+        t.log("work")
+    with t.episode("second") as second:
+        t.log("work")
+    assert first.started_at < first.events[0].t < first.ended_at < second.started_at
+    store = EpisodeStore(tmp_path)
+    assert store.resolve("latest") == second.id
+    assert [s.id for s in store.list()] == [second.id, first.id]
 
 
 def test_summary_fields(tmp_path):

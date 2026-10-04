@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import random
 import secrets
+import threading
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -31,6 +32,23 @@ if TYPE_CHECKING:  # pragma: no cover
 SCHEMA_VERSION = 1
 E = TypeVar("E", bound=Event)
 
+_clock_lock = threading.Lock()
+_last_wall_time = 0.0
+
+
+def _wall_time() -> float:
+    """``time.time()``, but strictly increasing within the process.
+
+    Wall clocks can advance in coarse steps (about 16 ms on Windows before Python 3.13), so
+    episodes and events recorded back to back would otherwise share a timestamp, and the order
+    of ``latest`` and ``ma-trace list`` would depend on the random part of the episode id.
+    """
+    global _last_wall_time
+    with _clock_lock:
+        now = time.time()
+        _last_wall_time = now if now > _last_wall_time else _last_wall_time + 1e-6
+        return _last_wall_time
+
 
 @dataclass
 class Episode:
@@ -39,7 +57,7 @@ class Episode:
     id: str
     name: str
     seed: int | None = None
-    started_at: float = field(default_factory=time.time)
+    started_at: float = field(default_factory=_wall_time)
     ended_at: float | None = None
     entrypoint: str | None = None
     entrypoint_args: dict[str, Any] = field(default_factory=dict)
