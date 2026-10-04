@@ -3,7 +3,7 @@
 **MA-Trace - causal tracing, coordination SLOs and deterministic replay for multi-agent LLM systems - exported through OpenTelemetry.**
 
 [![CI](https://github.com/nunar-nexus-forge/multi-agent-observability/actions/workflows/ci.yml/badge.svg)](https://github.com/nunar-nexus-forge/multi-agent-observability/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/multi-agent-observability.svg)](https://pypi.org/project/multi-agent-observability/)
+[![PyPI](https://img.shields.io/pypi/v/multi-agent-observability.svg?label=PyPI)](https://pypi.org/project/multi-agent-observability/)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 
